@@ -14,8 +14,8 @@ const Login = () => {
    navigate("/")
   }
   const initialState={
-    email:"",
-    password:"",
+    email:"gangadharana01@gmail.com",
+    password:"password",
   }
   
   const [data,setData]=useState(initialState)
