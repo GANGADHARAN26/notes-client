@@ -33,15 +33,21 @@ const MainPage = () => {
   const [liveData, setLiveData] = useState({});
   const [content, setContent] = useState({ checked: false, content: "" });
   const [task, setTask] = useState([]);
-  const initialNote = {
+  // const initialNote = ;
+  const [noteData, setNoteData] = useState({
     name: "",
     starred: true,
     trash: false,
     isremainder: false,
+    status:'pending',
     remainder: "",
-    timeout:0
-  };
-  const [noteData, setNoteData] = useState(initialNote);
+    timeout: 0,
+  });
+  const statusData=(e)=>{
+    setNoteData(prevNoteData=>({...prevNoteData, status:e}))
+    console.log(noteData)
+    // console.log(e)
+  }
   const [update, setUpdate] = useState(false);
   useEffect(() => {
     dispatch(notesAll(data));
@@ -58,12 +64,11 @@ const MainPage = () => {
       ? dispatch(updateNote(noteData))
       : dispatch(createNote({ ...noteData, task, email: localData.email }));
     setContent({ checked: false, content: "" });
-    toast.success(`${update ? "Updated successfully":"Crated successfully"}`)
+    toast.success(`${update ? "Updated successfully" : "Crated successfully"}`);
 
     setTimeout(() => {
       window.location.reload();
     }, 800);
-
   };
   const [star, setStar] = useState(0);
   useEffect(() => {
@@ -91,19 +96,23 @@ const MainPage = () => {
     update
       ? dispatch(deleteNote({ _id: id }))
       : setNoteData({ ...noteData, trash: true });
-      toast.success("Note deleted")
-      setTimeout(() => {
-        window.location.reload();
-      }, 800);
+    toast.success("Note deleted");
+    setTimeout(() => {
+      window.location.reload();
+    }, 800);
   };
   const handleTaskContentChange = (e, index) => {
     const newTask = [...task];
     console.log(newTask);
-    newTask[index] = { ...newTask[index], content:e.target.value };
-    console.log(e.target.value)
+    newTask[index] = { ...newTask[index], content: e.target.value };
+    console.log(e.target.value);
     setTask(newTask);
-    setNoteData({...noteData,task:newTask})
+    setNoteData({ ...noteData, task: newTask });
   };
+  function setDataForm(type) {
+    setForm(false);
+    setData({ ...data, type: type });
+  }
 
   return (
     <div
@@ -112,17 +121,17 @@ const MainPage = () => {
         backgroundImage: `url(${image})`,
       }}
     >
-           <ToastContainer
-      position="top-right"
-      autoClose={5000}
-      hideProgressBar={false}
-      newestOnTop={false}
-      closeOnClick
-      rtl={false}
-      pauseOnFocusLoss
-      draggable
-      pauseOnHover
-      theme="light"
+      <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
       />
       <button
         data-drawer-target="sidebar-multi-level-sidebar"
@@ -156,7 +165,7 @@ const MainPage = () => {
           <ul className="space-y-2 font-medium">
             <li className="m-6 divide-neutral-50">
               <button
-                onClick={() => setData({ ...data, type: "all" })}
+                onClick={() => setDataForm("all")}
                 className="flex text-2xl items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
               >
                 <span className="mr-2 text-4xl">
@@ -168,7 +177,7 @@ const MainPage = () => {
 
             <li>
               <button
-                onClick={() => setData({ ...data, type: "all" })}
+                onClick={() => setDataForm("all")}
                 className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
               >
                 <CgNotes />
@@ -177,7 +186,7 @@ const MainPage = () => {
             </li>
             <li>
               <button
-                onClick={() => setData({ ...data, type: "starred" })}
+                onClick={() => setDataForm("starred")}
                 className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
               >
                 <FaRegStar />
@@ -189,7 +198,7 @@ const MainPage = () => {
             </li>
             <li>
               <button
-                onClick={() => setData({ ...data, type: "remainder" })}
+                onClick={() => setDataForm("remainder")}
                 className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
               >
                 <MdOutlineNotificationsActive />
@@ -198,7 +207,7 @@ const MainPage = () => {
             </li>
             <li>
               <button
-                onClick={() => setData({ ...data, type: "trashed" })}
+                onClick={() => setDataForm("trashed")}
                 className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
               >
                 <RiDeleteBin5Line />
@@ -321,6 +330,25 @@ const MainPage = () => {
                   >
                     {update ? "Update" : "Save"}
                   </button>
+                  <form className="max-w-sm mx-auto">
+                    <label
+                      htmlFor="countries"
+                      className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                    >
+                      Select an option
+                    </label>
+                    <select
+                      id="countries"
+                       onChange={(e)=>{statusData(e.target.value)}}
+                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                    >
+                      <option value='pending'>Choose a status</option>
+                      {/* <option value="US">United States</option> */}
+                      <option value="pending">pending</option>
+                      <option value="in-progress">in-progress</option>
+                      <option value="completed">completed</option>
+                    </select>
+                  </form>
                   {!update && (
                     <>
                       <form className="max-w-sm mx-auto">
@@ -338,12 +366,16 @@ const MainPage = () => {
                           placeholder="24 hours"
                           min="0"
                           max="24"
-                          onChange={(e)=>setNoteData({...noteData,timeout:parseInt(e.target.value)})}
+                          onChange={(e) =>
+                            setNoteData({
+                              ...noteData,
+                              timeout: parseInt(e.target.value),
+                            })
+                          }
                           defaultValue="0"
                           required
                         />
                       </form>
-                 
                     </>
                   )}
                 </div>
@@ -392,16 +424,18 @@ const MainPage = () => {
                               <h6>there is no task</h6>
                             )}
                           </ul>
-                          <div className="logos flex justify-between">
-                            <MdOutlineNotificationsActive className="text-white" />
-                            {e.starred ? (
-                              <GoStarFill className="text-white" />
-                            ) : (
-                              <FaRegStar className="text-white" />
-                            )}
-
-                            <RiDeleteBin5Line className="text-white" />
-                          </div>
+                          <select
+                      id="countries"
+                      value={e.status}
+                       onChange={(e)=>{statusData(e.target.value)}}
+                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                    >
+                      <option value='pending'>Choose a status</option>
+                      {/* <option value="US">United States</option> */}
+                      <option value="pending">pending</option>
+                      <option value="in-progress">in-progress</option>
+                      <option value="completed">completed</option>
+                    </select>
                         </div>
                       </div>
                     ))
